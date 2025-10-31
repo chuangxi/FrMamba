@@ -38,8 +38,8 @@ class FrMamba(nn.Module):
         
         
     
-    def forward(self, x):
-        return self.FrMamba(x)
+    def forward(self, x, return_p=False):
+        return self.FrMamba(x, return_p=return_p)
             
     
 if __name__ == "__main__":
