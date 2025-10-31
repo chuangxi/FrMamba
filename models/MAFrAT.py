@@ -132,6 +132,7 @@ class MAFrAT(nn.Module):
             InvertedDepthWiseConv2d(2 * dim // 4, dim // 4),
         )
         self.pnet = PNet(in_ch=dim, base_ch= dim * 2)
+        self.latest_p = None
 
     def forward(self, x):
         # --- 支持两种输入格式 ---
@@ -146,7 +147,8 @@ class MAFrAT(nn.Module):
             B, C, H, W = x.shape
 
         # --- 自适应分数阶 ---
-        p = self.pnet(x).mean().detach()
+        self.latest_p = self.pnet(x)
+        p = self.latest_p.mean().detach()
 
 
         # --- 四分支分块 ---

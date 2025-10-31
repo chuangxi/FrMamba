@@ -1033,14 +1033,27 @@ class MambaVision_sim(nn.Module):
         return x
 
 
-    def forward(self, x):
+    def _collect_mafrat_p_values(self):
+        p_values = []
+        for module in self.modules():
+            if isinstance(module, MAFrAT) and getattr(module, "latest_p", None) is not None:
+                p_values.append(module.latest_p)
+        return p_values
+
+
+    def forward(self, x, return_p=False):
         x, skip_list = self.forward_features(x)
         x = self.forward_features_up(x, skip_list)
-        x = self.forward_final(x)
-        
+        logits = self.forward_final(x)
+
         if self.num_classes == 1:
-            return torch.sigmoid(x)
-        return x
+            output = torch.sigmoid(logits)
+        else:
+            output = logits
+
+        if return_p:
+            return output, self._collect_mafrat_p_values()
+        return output
 
     # def forward(self, x):
     #     x = self.forward_features(x)
